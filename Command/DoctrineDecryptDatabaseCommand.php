@@ -40,7 +40,7 @@ class DoctrineDecryptDatabaseCommand extends AbstractCommand
         $question = $this->getHelper('question');
 
         // Get list of supported encryptors
-        $supportedExtensions = DoctrineEncryptExtension::$supportedEncryptorClasses;
+        $supportedExtensions = DoctrineEncryptExtension::SupportedEncryptorClasses;
         $batchSize = $input->getArgument('batchSize');
 
         // If encryptor has been set use that encryptor else use default
