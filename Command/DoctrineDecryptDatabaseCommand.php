@@ -74,7 +74,7 @@ class DoctrineDecryptDatabaseCommand extends AbstractCommand
 
         $confirmationQuestion = new ConfirmationQuestion(
             '<question>' . count($metaDataArray) . ' entities found which are containing ' . $propertyCount . ' properties with the encryption tag. ' . PHP_EOL . '' .
-            'Which are going to be decrypted with [' . $this->subscriber->getEncryptor() . ']. ' . PHP_EOL . '' .
+            'Which are going to be decrypted with [' . get_class($this->subscriber->getEncryptor()) . ']. ' . PHP_EOL . '' .
             'Wrong settings can mess up your data and it will be unrecoverable. ' . PHP_EOL . '' .
             'I advise you to make <bg=yellow;options=bold>a backup</bg=yellow;options=bold>. ' . PHP_EOL . '' .
             'Continue with this action? (y/yes)</question>', false
