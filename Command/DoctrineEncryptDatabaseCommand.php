@@ -73,6 +73,7 @@ class DoctrineEncryptDatabaseCommand extends AbstractCommand
         // Start decrypting database
         $output->writeln('' . PHP_EOL . 'Encrypting all fields can take up to several minutes depending on the database size.');
 
+        $valueCounter = 0;
         // Loop through entity manager meta data
         foreach ($metaDataArray as $metaData) {
             $i = 0;
@@ -82,13 +83,14 @@ class DoctrineEncryptDatabaseCommand extends AbstractCommand
             $output->writeln(sprintf('Processing <comment>%s</comment>', $metaData->name));
             $progressBar = new ProgressBar($output, $totalCount);
             foreach ($iterator as $row) {
-                $this->subscriber->processFields($row[0]);
+                $this->subscriber->processFields($row[0], true, $this->entityManager);
+                $valueCounter++;
 
                 if (($i % $batchSize) === 0) {
                     $this->entityManager->flush();
                     $this->entityManager->clear();
-                    $progressBar->advance($batchSize);
                 }
+                $progressBar->advance(1);
                 $i++;
             }
 
@@ -98,7 +100,7 @@ class DoctrineEncryptDatabaseCommand extends AbstractCommand
         }
 
         // Say it is finished
-        $output->writeln('Encryption finished. Values encrypted: <info>' . $this->subscriber->encryptCounter . ' values</info>.' . PHP_EOL . 'All values are now encrypted.');
+        $output->writeln('Encryption finished. Values encrypted: <info>' . $valueCounter . ' values</info>.' . PHP_EOL . 'All values are now encrypted.');
     }
 
 

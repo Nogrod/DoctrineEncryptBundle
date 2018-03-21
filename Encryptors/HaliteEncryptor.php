@@ -40,7 +40,7 @@ class HaliteEncryptor implements EncryptorInterface
      */
     public function decrypt($data)
     {
-        return \ParagonIE\Halite\Symmetric\Crypto::decrypt($data, $this->getKey());
+        return \ParagonIE\Halite\Symmetric\Crypto::decrypt($data, $this->getKey())->getString();
     }
 
     private function getKey()

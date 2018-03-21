@@ -88,6 +88,7 @@ class DoctrineDecryptDatabaseCommand extends AbstractCommand
         $output->writeln('' . PHP_EOL . 'Decrypting all fields. This can take up to several minutes depending on the database size.');
 
         $valueCounter = 0;
+        $this->subscriber->setEncryptor(null);
 
         // Loop through entity manager meta data
         foreach ($this->getEncryptionableEntityMetaData() as $metaData) {
@@ -99,29 +100,7 @@ class DoctrineDecryptDatabaseCommand extends AbstractCommand
             $progressBar = new ProgressBar($output, $totalCount);
             foreach ($iterator as $row) {
                 $entity = $row[0];
-
-                // Create reflectionClass for each entity
-                $entityReflectionClass = new \ReflectionClass($entity);
-
-                //Get the current encryptor used
-                $encryptorUsed = $this->subscriber->getEncryptor();
-
-                //Loop through the property's in the entity
-                foreach ($this->getEncryptionableProperties($metaData) as $property) {
-                    $methodeName = ucfirst($property->getName());
-
-                    $getter = 'get' . $methodeName;
-                    $setter = 'set' . $methodeName;
-
-                    //Check if getter and setter are set
-                    if ($entityReflectionClass->hasMethod($getter) && $entityReflectionClass->hasMethod($setter)) {
-                        $unencrypted = $entity->$getter();
-                        $entity->$setter($unencrypted);
-                        $valueCounter++;
-                    }
-                }
-
-                $this->subscriber->setEncryptor(null);
+                $valueCounter += count($this->getEncryptionableProperties($metaData));
                 $this->entityManager->persist($entity);
 
                 if (($i % $batchSize) === 0) {
@@ -130,20 +109,17 @@ class DoctrineDecryptDatabaseCommand extends AbstractCommand
                 }
                 $progressBar->advance(1);
                 $i++;
-
-                $this->subscriber->setEncryptor($encryptorUsed);
             }
 
 
             $progressBar->finish();
             $output->writeln('');
-            $encryptorUsed = $this->subscriber->getEncryptor();
-            $this->subscriber->setEncryptor(null);
+
             $this->entityManager->flush();
             $this->entityManager->clear();
-            $this->subscriber->setEncryptor($encryptorUsed);
         }
+        $this->subscriber->restoreEncryptor();
 
-        $output->writeln('' . PHP_EOL . 'Decryption finished values found: <info>' . $valueCounter . '</info>, decrypted: <info>' . $this->subscriber->decryptCounter . '</info>.' . PHP_EOL . 'All values are now decrypted.');
+        $output->writeln('' . PHP_EOL . 'Decryption finished values found: <info>' . $valueCounter . '</info>.' . PHP_EOL . 'All values are now decrypted.');
     }
 }

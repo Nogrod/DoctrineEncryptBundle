@@ -17,7 +17,7 @@ use Symfony\Component\Finder\Finder;
  */
 class DoctrineEncryptExtension extends Extension
 {
-    const SupportedEncryptorClasses = array(
+    public const SupportedEncryptorClasses = array(
         'Defuse' => 'Ambta\DoctrineEncryptBundle\Encryptors\DefuseEncryptor',
         'Halite' => 'Ambta\DoctrineEncryptBundle\Encryptors\HaliteEncryptor',
     );
