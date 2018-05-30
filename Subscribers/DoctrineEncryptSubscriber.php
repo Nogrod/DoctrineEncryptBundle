@@ -81,7 +81,7 @@ class DoctrineEncryptSubscriber implements EventSubscriber
      * @param [type] $[name] [<description>]
      * @param EncryptorInterface $encryptorClass 
     */
-    public function setEncryptor(EncryptorInterface $encryptorClass)
+    public function setEncryptor(EncryptorInterface $encryptorClass = null)
     {
         $this->encryptor = $encryptorClass;
     }
@@ -154,7 +154,7 @@ class DoctrineEncryptSubscriber implements EventSubscriber
     /**
      * Realization of EventSubscriber interface method.
      *
-     * @return Array Return all events which this subscriber is listening
+     * @return array Return all events which this subscriber is listening
      */
     public function getSubscribedEvents()
     {

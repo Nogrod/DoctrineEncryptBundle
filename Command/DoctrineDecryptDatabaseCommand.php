@@ -46,7 +46,9 @@ class DoctrineDecryptDatabaseCommand extends AbstractCommand
         // If encryptor has been set use that encryptor else use default
         if ($input->getArgument('encryptor')) {
             if (isset($supportedExtensions[$input->getArgument('encryptor')])) {
-                $this->subscriber->setEncryptor($supportedExtensions[$input->getArgument('encryptor')]);
+                $reflection = new \ReflectionClass($supportedExtensions[$input->getArgument('encryptor')]);
+                $encryptor = $reflection->newInstance();
+                $this->subscriber->setEncryptor($encryptor);
             } else {
                 if (class_exists($input->getArgument('encryptor'))) {
                     $this->subscriber->setEncryptor($input->getArgument('encryptor'));
