@@ -14,11 +14,12 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Util\ClassUtils;
 use Ambta\DoctrineEncryptBundle\Encryptors\EncryptorInterface;
+use ReflectionProperty;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * Doctrine event subscriber which encrypt/decrypt entities
-*/
+ */
 class DoctrineEncryptSubscriber implements EventSubscriber
 {
     /**
@@ -28,30 +29,30 @@ class DoctrineEncryptSubscriber implements EventSubscriber
 
     /**
      * Encryptor interface namespace
-    */
+     */
     const ENCRYPTOR_INTERFACE_NS = 'Ambta\DoctrineEncryptBundle\Encryptors\EncryptorInterface';
 
     /**
      * Encrypted annotation full name
-    */
+     */
     const ENCRYPTED_ANN_NAME = 'Ambta\DoctrineEncryptBundle\Configuration\Encrypted';
 
     /**
      * Encryptor
      * @var EncryptorInterface
-    */
+     */
     private $encryptor;
 
     /**
      * Annotation reader
      * @var \Doctrine\Common\Annotations\Reader
-    */
+     */
     private $annReader;
 
     /**
      * Used for restoring the encryptor after changing it
      * @var string
-    */
+     */
     private $restoreEncryptor;
 
     /**
@@ -61,6 +62,18 @@ class DoctrineEncryptSubscriber implements EventSubscriber
     private $propertyCache = [];
 
     /**
+     * Count amount of decrypted values in this service
+     * @var integer
+     */
+    public $decryptCounter = 0;
+
+    /**
+     * Count amount of encrypted values in this service
+     * @var integer
+     */
+    public $encryptCounter = 0;
+
+    /**
      * Initialization of subscriber
      *
      * @param Reader $annReader
@@ -68,7 +81,7 @@ class DoctrineEncryptSubscriber implements EventSubscriber
      * @param EncryptorInterface|NULL $service (Optional)  An EncryptorInterface.
      *
      * This allows for the use of dependency injection for the encrypters.
-    */
+     */
     public function __construct(Reader $annReader, EncryptorInterface $encryptor)
     {
         $this->annReader = $annReader;
@@ -79,8 +92,8 @@ class DoctrineEncryptSubscriber implements EventSubscriber
     /**
      * Change the encryptor
      * @param [type] $[name] [<description>]
-     * @param EncryptorInterface $encryptorClass 
-    */
+     * @param EncryptorInterface $encryptorClass
+     */
     public function setEncryptor(EncryptorInterface $encryptorClass = null)
     {
         $this->encryptor = $encryptorClass;
@@ -89,8 +102,8 @@ class DoctrineEncryptSubscriber implements EventSubscriber
     /**
      * Get the current encryptor
      *
-     * @return Object returns the encryptor class or null
-    */
+     * @return EncryptorInterface returns the encryptor class or null
+     */
     public function getEncryptor()
     {
         return $this->encryptor;
@@ -177,7 +190,6 @@ class DoctrineEncryptSubscriber implements EventSubscriber
      */
     public function processFields($entity, $isEncryptOperation, $entityManager)
     {
-
         if (!empty($this->encryptor)) {
             // Check which operation to be used
             $encryptorMethod = $isEncryptOperation ? 'encrypt' : 'decrypt';

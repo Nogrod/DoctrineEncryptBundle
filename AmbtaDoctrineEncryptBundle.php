@@ -10,7 +10,6 @@ use Ambta\DoctrineEncryptBundle\DependencyInjection\Compiler\RegisterServiceComp
 
 class AmbtaDoctrineEncryptBundle extends Bundle
 {
-
     public function build(ContainerBuilder $container)
     {
         parent::build($container);

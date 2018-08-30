@@ -6,7 +6,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\Finder\Finder;
 
 /**
  * Initialization of bundle.
@@ -27,18 +26,14 @@ class DoctrineEncryptExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-
         // Create configuration object
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        // Set orm-service in array of services
-        $services = array('orm' => 'orm-services');
-
         // If empty encryptor class, use Halite encryptor
-        if(in_array($config['encryptor_class'],array_keys(self::SupportedEncryptorClasses))){
+        if (in_array($config['encryptor_class'], array_keys(self::SupportedEncryptorClasses))) {
             $config['encryptor_class_full'] = self::SupportedEncryptorClasses[$config['encryptor_class']];
-        }else{
+        } else {
             $config['encryptor_class_full'] = self::SupportedEncryptorClasses['Halite'];
         }
 
@@ -48,7 +43,7 @@ class DoctrineEncryptExtension extends Extension
 
         // Load service file
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
-        $loader->load(sprintf('%s.yml', $services['orm']));
+        $loader->load('services.yml');
     }
 
     /**

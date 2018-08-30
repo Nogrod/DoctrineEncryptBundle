@@ -3,8 +3,7 @@
 namespace Ambta\DoctrineEncryptBundle\Command;
 
 use Ambta\DoctrineEncryptBundle\DependencyInjection\DoctrineEncryptExtension;
-use Doctrine\Common\Annotations\AnnotationReader;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -66,7 +65,7 @@ class DoctrineDecryptDatabaseCommand extends AbstractCommand
         // Set counter and loop through entity manager meta data
         $propertyCount = 0;
         foreach ($metaDataArray as $metaData) {
-            if ($metaData->isMappedSuperclass) {
+            if ($metaData instanceof ClassMetadataInfo and $metaData->isMappedSuperclass) {
                 continue;
             }
 
@@ -83,7 +82,7 @@ class DoctrineDecryptDatabaseCommand extends AbstractCommand
         );
 
         if (!$question->ask($input, $output, $confirmationQuestion)) {
-            return;
+            return 1;
         }
 
         // Start decrypting database
